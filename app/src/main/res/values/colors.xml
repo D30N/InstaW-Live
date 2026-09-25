@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- light card -->
+    <color name="ink">#171B26</color>
+    <color name="ink_soft">#737780</color>
+    <color name="ink_faint">#737780</color>
+    <!-- dark card -->
+    <color name="ink_dark">#FFFFFF</color>
+    <color name="ink_soft_dark">#D4D4D4</color>
+    <color name="ink_faint_dark">#9A9A9A</color>
+    <!-- weekly delta -->
+    <color name="delta_up">#00A846</color>
+    <color name="delta_down">#EF4444</color>
+    <!-- weekly delta (dark card) -->
+    <color name="delta_up_dark">#A5D6A7</color>
+    <color name="delta_down_dark">#EF9A9A</color>
+    <!-- launcher icon background -->
+</resources>
