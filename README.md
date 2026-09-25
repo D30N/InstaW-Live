@@ -1,4 +1,4 @@
-# InstaW Live
+# InstaW — Instagram Live Follower Count Widget
 
 **InstaW Live** is an Android home-screen widget app that shows your Instagram follower count — live, right on your home screen.
 
