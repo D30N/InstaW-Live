@@ -47,6 +47,7 @@ class MainActivity : Activity() {
     private val themeKeys = listOf(
         "light" to "Light",
         "dark" to "Dark",
+        "liquid_glass" to "Liquid Glass",
         "frosted_white" to "Frosted White",
         "frosted_black" to "Frosted Black",
         "system" to "System",
@@ -398,6 +399,7 @@ class MainActivity : Activity() {
         // with the right theme on first draw.
         themeKey = when (WidgetStore.getDefaultTheme(this@MainActivity)) {
             "dark" -> "dark"
+            "liquid_glass" -> "liquid_glass"
             "frosted_white" -> "frosted_white"
             "frosted_black" -> "frosted_black"
             "system" -> "system"

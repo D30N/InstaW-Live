@@ -194,6 +194,7 @@ class WidgetConfigActivity : Activity() {
         val themeOptions = listOf(
             "light" to "Light",
             "dark" to "Dark",
+            "liquid_glass" to "Liquid Glass",
             "frosted_white" to "Frosted White",
             "frosted_black" to "Frosted Black",
             "system" to "System",

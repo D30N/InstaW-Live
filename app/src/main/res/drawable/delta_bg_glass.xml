@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Saturated green pill for the Liquid Glass theme (bright wallpaper-proof). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#2ED573" />
+    <corners android:radius="12dp" />
+</shape>

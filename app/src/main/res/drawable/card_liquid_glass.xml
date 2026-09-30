@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- iOS-style Liquid Glass card: near-clear tint so the wallpaper shows
+     through, top light falloff + bottom shade for 3D curvature, a faint
+     diagonal sheen, and a bright specular rim. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- base: very light white veil -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <solid android:color="#26FFFFFF" />
+        </shape>
+    </item>
+    <!-- top light falloff (curvature highlight) -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <gradient
+                android:angle="270"
+                android:startColor="#2EFFFFFF"
+                android:centerColor="#0AFFFFFF"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- bottom inner shade (curvature depth) -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <gradient
+                android:angle="90"
+                android:startColor="#1F000000"
+                android:centerColor="#08000000"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- faint diagonal liquid sheen -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <gradient
+                android:angle="315"
+                android:startColor="#12FFFFFF"
+                android:centerColor="#06FFFFFF"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- bright specular rim -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <stroke android:width="2dp" android:color="#D6FFFFFF" />
+            <solid android:color="#00000000" />
+        </shape>
+    </item>
+</layer-list>
