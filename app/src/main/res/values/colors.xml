@@ -8,6 +8,10 @@
     <color name="ink_dark">#FFFFFF</color>
     <color name="ink_soft_dark">#D4D4D4</color>
     <color name="ink_faint_dark">#9A9A9A</color>
+    <!-- liquid glass (white): darker secondary inks so small text stays
+         readable on the translucent card -->
+    <color name="ink_soft_glass">#232833</color>
+    <color name="ink_faint_glass">#414755</color>
     <!-- weekly delta -->
     <color name="delta_up">#00A846</color>
     <color name="delta_down">#EF4444</color>

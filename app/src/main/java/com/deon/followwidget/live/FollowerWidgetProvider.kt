@@ -210,8 +210,18 @@ class FollowerWidgetProvider : AppWidgetProvider() {
             val theme = themeOverride ?: WidgetStore.effectiveTheme(ctx, appWidgetId)
             val darkText = theme == "light" || theme == "frosted_white" || theme == "liquid_glass"
             val ink = ctx.getColor(if (darkText) R.color.ink else R.color.ink_dark)
-            val inkSoft = ctx.getColor(if (darkText) R.color.ink_soft else R.color.ink_soft_dark)
-            val inkFaint = ctx.getColor(if (darkText) R.color.ink_faint else R.color.ink_faint_dark)
+            // White liquid glass is translucent: medium-gray secondary inks
+            // wash out on it, so use darker glass-specific inks.
+            val inkSoft = ctx.getColor(when {
+                theme == "liquid_glass" -> R.color.ink_soft_glass
+                darkText -> R.color.ink_soft
+                else -> R.color.ink_soft_dark
+            })
+            val inkFaint = ctx.getColor(when {
+                theme == "liquid_glass" -> R.color.ink_faint_glass
+                darkText -> R.color.ink_faint
+                else -> R.color.ink_faint_dark
+            })
 
             views.setInt(
                 R.id.card, "setBackgroundResource",

@@ -11,7 +11,7 @@ android {
         applicationId = "com.deon.followwidget.live"
         minSdk = 26
         targetSdk = 34
-        versionCode = 53
+        versionCode = 54
         versionName = "1.0"
     }
 
