@@ -195,6 +195,7 @@ class WidgetConfigActivity : Activity() {
             "light" to "Light",
             "dark" to "Dark",
             "liquid_glass" to "Liquid Glass",
+            "liquid_glass_dark" to "Liquid Glass Dark",
             "frosted_white" to "Frosted White",
             "frosted_black" to "Frosted Black",
             "system" to "System",

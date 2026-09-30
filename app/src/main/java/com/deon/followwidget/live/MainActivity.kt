@@ -48,6 +48,7 @@ class MainActivity : Activity() {
         "light" to "Light",
         "dark" to "Dark",
         "liquid_glass" to "Liquid Glass",
+        "liquid_glass_dark" to "Liquid Glass Dark",
         "frosted_white" to "Frosted White",
         "frosted_black" to "Frosted Black",
         "system" to "System",
@@ -400,6 +401,7 @@ class MainActivity : Activity() {
         themeKey = when (WidgetStore.getDefaultTheme(this@MainActivity)) {
             "dark" -> "dark"
             "liquid_glass" -> "liquid_glass"
+            "liquid_glass_dark" -> "liquid_glass_dark"
             "frosted_white" -> "frosted_white"
             "frosted_black" -> "frosted_black"
             "system" -> "system"

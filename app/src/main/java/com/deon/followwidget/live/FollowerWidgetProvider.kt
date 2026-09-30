@@ -220,6 +220,7 @@ class FollowerWidgetProvider : AppWidgetProvider() {
                     "frosted_white" -> R.drawable.card_frosted_white
                     "frosted_black" -> R.drawable.card_frosted_black
                     "liquid_glass" -> R.drawable.card_liquid_glass
+                    "liquid_glass_dark" -> R.drawable.card_liquid_glass_dark
                     else -> R.drawable.card_bg_light
                 }
             )
@@ -281,7 +282,7 @@ class FollowerWidgetProvider : AppWidgetProvider() {
                 // sign (green for growth, red for drop). Safe visibility
                 // toggle between four pre-styled TextViews — no reflection.
                 val isDown = delta < 0
-                val isGlass = theme == "liquid_glass"
+                val isGlass = theme == "liquid_glass" || theme == "liquid_glass_dark"
                 // Glass uses the bright saturated pills (like the light
                 // theme's), not the muted dark-card ones.
                 val isDarkCard = !darkText && !isGlass

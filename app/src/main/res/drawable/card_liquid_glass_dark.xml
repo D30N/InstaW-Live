@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- iOS-style Liquid Glass card, BLACK shaded: dark translucent veil so the
+     wallpaper glows through, top light falloff + deep bottom shade for 3D
+     curvature, a faint diagonal sheen, and a luminous specular rim. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- base: dark black veil -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <solid android:color="#750A0A0E" />
+        </shape>
+    </item>
+    <!-- top light falloff (light catching on dark glass) -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <gradient
+                android:angle="270"
+                android:startColor="#2EFFFFFF"
+                android:centerColor="#0AFFFFFF"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- bottom inner shade (curvature depth) -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <gradient
+                android:angle="90"
+                android:startColor="#4B000000"
+                android:centerColor="#14000000"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- faint diagonal liquid sheen -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <gradient
+                android:angle="315"
+                android:startColor="#0EFFFFFF"
+                android:centerColor="#05FFFFFF"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- luminous specular rim -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="28dp" />
+            <stroke android:width="2dp" android:color="#E6FFFFFF" />
+            <solid android:color="#00000000" />
+        </shape>
+    </item>
+</layer-list>
