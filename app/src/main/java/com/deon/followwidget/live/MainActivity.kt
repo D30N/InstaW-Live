@@ -52,7 +52,8 @@ class MainActivity : Activity() {
         "frosted_white" to "Frosted White",
         "frosted_black" to "Frosted Black",
         "system" to "System",
-        "system_frosted" to "System (Frosted)"
+        "system_frosted" to "System (Frosted)",
+        "system_liquid" to "System (Liquid)"
     )
 
     private fun dp(n: Int): Int = (n * resources.displayMetrics.density).toInt()
@@ -406,6 +407,7 @@ class MainActivity : Activity() {
             "frosted_black" -> "frosted_black"
             "system" -> "system"
             "system_frosted" -> "system_frosted"
+            "system_liquid" -> "system_liquid"
             else -> "light"
         }
         cardStyleKey = WidgetStore.getDefaultCardStyle(this@MainActivity)

@@ -168,6 +168,8 @@ class FollowerWidgetProvider : AppWidgetProvider() {
                 "system" -> if (WidgetStore.isSystemNightMode(ctx)) "dark" else "light"
                 "system_frosted" ->
                     if (WidgetStore.isSystemNightMode(ctx)) "frosted_black" else "frosted_white"
+                "system_liquid" ->
+                    if (WidgetStore.isSystemNightMode(ctx)) "liquid_glass_dark" else "liquid_glass"
                 else -> themeKey
             }
             // appWidgetId -1: only used for effectiveTheme (overridden) and

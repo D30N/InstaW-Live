@@ -199,7 +199,8 @@ class WidgetConfigActivity : Activity() {
             "frosted_white" to "Frosted White",
             "frosted_black" to "Frosted Black",
             "system" to "System",
-            "system_frosted" to "System (Frosted)"
+            "system_frosted" to "System (Frosted)",
+            "system_liquid" to "System (Liquid)"
         )
         var selectedTheme = WidgetStore.getDefaultTheme(ctx)
         val themeCard = LinearLayout(ctx).apply {

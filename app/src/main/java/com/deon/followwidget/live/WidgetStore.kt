@@ -54,6 +54,8 @@ object WidgetStore {
     /**
      * Theme actually used for rendering: "system" follows the phone's
      * dark mode (light card / dark card), "system_frosted" follows it
+     * with frosted cards, "system_liquid" follows it with liquid glass
+     * cards (white glass in light mode, dark glass in dark mode).
      * too (frosted white / frosted black). Fixed themes pass through.
      *
      * Night mode is read from the system setting first (reliable on
@@ -61,10 +63,11 @@ object WidgetStore {
      */
     fun effectiveTheme(ctx: Context, appWidgetId: Int): String {
         val stored = getTheme(ctx, appWidgetId)
-        if (stored != "system" && stored != "system_frosted") return stored
+        if (stored != "system" && stored != "system_frosted" && stored != "system_liquid") return stored
         val night = isSystemNightMode(ctx)
         return when (stored) {
             "system" -> if (night) "dark" else "light"
+            "system_liquid" -> if (night) "liquid_glass_dark" else "liquid_glass"
             else -> if (night) "frosted_black" else "frosted_white"
         }
     }
