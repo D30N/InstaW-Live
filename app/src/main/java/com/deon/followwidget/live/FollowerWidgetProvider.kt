@@ -208,7 +208,7 @@ class FollowerWidgetProvider : AppWidgetProvider() {
             themeOverride: String? = null, forPreview: Boolean = false
         ) {
             val theme = themeOverride ?: WidgetStore.effectiveTheme(ctx, appWidgetId)
-            val darkText = theme == "light" || theme == "frosted_white"
+            val darkText = theme == "light" || theme == "frosted_white" || theme == "liquid_glass"
             val ink = ctx.getColor(if (darkText) R.color.ink else R.color.ink_dark)
             val inkSoft = ctx.getColor(if (darkText) R.color.ink_soft else R.color.ink_soft_dark)
             val inkFaint = ctx.getColor(if (darkText) R.color.ink_faint else R.color.ink_faint_dark)
