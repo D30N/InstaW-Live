@@ -294,10 +294,10 @@ class FollowerWidgetProvider : AppWidgetProvider() {
                 // sign (green for growth, red for drop). Safe visibility
                 // toggle between four pre-styled TextViews — no reflection.
                 val isDown = delta < 0
-                val isGlass = theme == "liquid_glass" || theme == "liquid_glass_dark"
-                // Glass uses the bright saturated pills (like the light
-                // theme's), not the muted dark-card ones.
-                val isDarkCard = !darkText && !isGlass
+                // Pill follows theme like everywhere else: white liquid
+                // glass gets the light pills, dark liquid glass the dark
+                // pills.
+                val isDarkCard = !darkText
                 val deltaView = when {
                     isDown && isDarkCard -> R.id.delta_down_dark
                     isDown -> R.id.delta_down
@@ -325,16 +325,6 @@ class FollowerWidgetProvider : AppWidgetProvider() {
                         }
                     )
                 )
-                // Liquid Glass: saturated bright pill + white text (matches
-                // the approved mockup), overriding the pale light-theme pill.
-                if (isGlass) {
-                    views.setInt(
-                        deltaView, "setBackgroundResource",
-                        if (isDown) R.drawable.delta_bg_glass_down
-                        else R.drawable.delta_bg_glass
-                    )
-                    views.setTextColor(deltaView, ctx.getColor(android.R.color.white))
-                }
                 views.setTextViewText(R.id.delta_label, "within a week")
                 views.setTextColor(R.id.delta_label, inkFaint)
             }
