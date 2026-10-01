@@ -16,9 +16,9 @@
 
 ## Screenshots
 
-| Dark card | Light card | Name-on-top style |
-|-----------|------------|-------------------|
-| ![Dark card](screenshots/widget-dark.png) | ![Light card](screenshots/widget-light.png) | ![Name on top](screenshots/widget-nametop-dark.png) |
+| App config | Liquid Glass widget | Dark widget |
+|------------|-------------|-------------|
+| ![App config](screenshots/app-config.jpg) | ![Liquid Glass](screenshots/widget-glass.jpg) | ![Dark](screenshots/widget-dark.jpg) |
 
 ## Download
 
