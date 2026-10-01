@@ -14,9 +14,6 @@ object WidgetStore {
     private const val PREFS = "follower_widget"
     private const val SNAPSHOT_KEEP_MS = 8L * 24 * 60 * 60 * 1000 // 8 days
     private const val SNAPSHOT_MIN_GAP_MS = 60L * 60 * 1000 // 1 hour
-    // One-time growth seed: the owner's real count on 2026-09-23 10:00 IST.
-    private const val SEED_TIME_MS = 1790137800000L
-    private const val SEED_COUNT = 56114L
 
     private fun prefs(ctx: Context) =
         ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -178,14 +175,6 @@ object WidgetStore {
         for (i in 0 until snaps.length()) {
             val arr = snaps.optJSONArray(i) ?: continue
             if (now - arr.optLong(0) <= SNAPSHOT_KEEP_MS) kept.put(arr)
-        }
-        // One-time seed: only on a completely fresh history, and only while
-        // the seed itself is still within the keep window. A stale seed must
-        // never be (re-)inserted — it would anchor the rolling 7-day delta
-        // to a fixed point in the past (Sep 23) instead of 7 days ago.
-        if (IgSession.isLoggedIn(ctx) && kept.length() == 0 &&
-            SEED_TIME_MS >= now - SNAPSHOT_KEEP_MS) {
-            kept.put(JSONArray().put(SEED_TIME_MS).put(SEED_COUNT))
         }
         // append if enough time passed since last snapshot or count changed
         val last = if (kept.length() > 0) kept.optJSONArray(kept.length() - 1) else null
