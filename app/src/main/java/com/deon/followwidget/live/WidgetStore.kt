@@ -179,29 +179,13 @@ object WidgetStore {
             val arr = snaps.optJSONArray(i) ?: continue
             if (now - arr.optLong(0) <= SNAPSHOT_KEEP_MS) kept.put(arr)
         }
-        // One-time seed: the owner's real follower count on the morning
-        // the live widget went live (2026-09-23 10:00 IST — the
-        // growth-tracking baseline). Gives the green "within a week"
-        // delta something real to compare against from day one instead
-        // of starting blank. The dashboard count is inherently the
-        // logged-in user's own, so a login is the only gate the seed
-        // needs (the saved login username is blank on existing installs).
-        // Inserted ahead of any newer snapshots, once.
-        if (IgSession.isLoggedIn(ctx)) {
-            var hasOld = false
-            for (i in 0 until kept.length()) {
-                if (kept.optJSONArray(i)?.optLong(0) ?: Long.MAX_VALUE <= SEED_TIME_MS) {
-                    hasOld = true
-                    break
-                }
-            }
-            if (!hasOld) {
-                // prepend the seed ahead of the newer snapshots, then
-                // fall through to the normal append below
-                val seeded = JSONArray().put(JSONArray().put(SEED_TIME_MS).put(SEED_COUNT))
-                for (i in 0 until kept.length()) seeded.put(kept.optJSONArray(i))
-                kept = seeded
-            }
+        // One-time seed: only on a completely fresh history, and only while
+        // the seed itself is still within the keep window. A stale seed must
+        // never be (re-)inserted — it would anchor the rolling 7-day delta
+        // to a fixed point in the past (Sep 23) instead of 7 days ago.
+        if (IgSession.isLoggedIn(ctx) && kept.length() == 0 &&
+            SEED_TIME_MS >= now - SNAPSHOT_KEEP_MS) {
+            kept.put(JSONArray().put(SEED_TIME_MS).put(SEED_COUNT))
         }
         // append if enough time passed since last snapshot or count changed
         val last = if (kept.length() > 0) kept.optJSONArray(kept.length() - 1) else null
@@ -223,12 +207,22 @@ object WidgetStore {
         val snaps = getSnapshots(ctx, key(rawUsername))
         if (snaps.length() == 0) return null
         val weekAgo = now - 7L * 24 * 60 * 60 * 1000
+        // Baselines older than the keep window are stale (e.g. the Sep 23
+        // seed) and must never anchor the rolling 7-day delta.
+        val oldestUsable = now - SNAPSHOT_KEEP_MS
         var base: JSONArray? = null
         for (i in 0 until snaps.length()) {
             val arr = snaps.optJSONArray(i) ?: continue
-            if (arr.optLong(0) <= weekAgo) base = arr // latest snapshot at least 7 days old
+            val t = arr.optLong(0)
+            if (t <= weekAgo && t >= oldestUsable) base = arr // latest snapshot ~7 days old
         }
-        if (base == null) base = snaps.optJSONArray(0) // oldest we have
+        if (base == null) {
+            // No snapshot near 7 days ago — oldest usable snapshot we have.
+            for (i in 0 until snaps.length()) {
+                val arr = snaps.optJSONArray(i) ?: continue
+                if (arr.optLong(0) >= oldestUsable) { base = arr; break }
+            }
+        }
         base ?: return null
         // Need a little history for the delta to mean anything (an hour —
         // the seed covers day one, real snapshots take over after that).

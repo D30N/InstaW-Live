@@ -11,8 +11,8 @@ android {
         applicationId = "com.deon.followwidget.live"
         minSdk = 26
         targetSdk = 34
-        versionCode = 56
-        versionName = "1.1"
+        versionCode = 57
+        versionName = "1.1.1"
     }
 
     signingConfigs {
