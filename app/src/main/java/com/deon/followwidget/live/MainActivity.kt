@@ -1,14 +1,17 @@
 package com.deon.followwidget.live
 
+import android.Manifest
 import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.text.InputType
 import android.text.SpannableString
@@ -241,7 +244,15 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Milestone alerts need notification permission (Android 13+).
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1001)
+        }
         M3Ui.dark = WidgetStore.isAppDarkTheme(this)
+        M3Ui.accentKey = WidgetStore.getAccent(this)
         window.statusBarColor = M3Ui.BG
 
         val root = LinearLayout(this).apply {
@@ -526,6 +537,98 @@ class MainActivity : Activity() {
             }
         }
 
+        // ---- growth pill (daily / weekly delta) ----
+        root.addView(sectionLabel("Growth pill"))
+        val deltaCard = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dp(14).toFloat()
+                setColor(M3Ui.CARD)
+            }
+            setPadding(dp(4), dp(4), dp(4), dp(4))
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        root.addView(deltaCard)
+        val deltaModes = listOf(
+            "weekly" to ("Weekly" to "Change over the last 7 days"),
+            "daily" to ("Daily" to "Change over the last 24 hours")
+        )
+        val deltaRadios = mutableListOf<ImageView>()
+        fun refreshDeltaRadios() {
+            val cur = WidgetStore.getDeltaMode(this, userInput.text.toString())
+            deltaModes.forEachIndexed { i, (key, _) ->
+                deltaRadios[i].setImageDrawable(M3Ui.radioDrawable(this, key == cur))
+            }
+        }
+        deltaModes.forEachIndexed { index, (key, titles) ->
+            val (title, sub) = titles
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(dp(12), dp(9), dp(12), dp(9))
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                isClickable = true
+                isFocusable = true
+            }
+            val topRow = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            }
+            topRow.addView(TextView(this).apply {
+                text = title
+                setTextColor(M3Ui.INK)
+                sp(this, 15f)
+                layoutParams = LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
+                )
+            })
+            val radio = ImageView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(dp(20), dp(20))
+            }
+            deltaRadios.add(radio)
+            topRow.addView(radio)
+            row.addView(topRow)
+            row.addView(TextView(this).apply {
+                text = sub
+                setTextColor(M3Ui.GREY)
+                sp(this, 12f)
+            })
+            row.setOnClickListener {
+                val u = userInput.text.toString().trim().trimStart('@').lowercase()
+                if (u.isNotEmpty()) WidgetStore.setDeltaMode(this, u, key)
+                refreshDeltaRadios()
+                FollowerWidgetProvider.allWidgetIds(this)
+                    .forEach { FollowerWidgetProvider.updateWidget(this, it) }
+                Toast.makeText(this, "Growth pill: $title", Toast.LENGTH_SHORT).show()
+            }
+            deltaCard.addView(row)
+            if (index < deltaModes.size - 1) {
+                deltaCard.addView(View(this).apply {
+                    setBackgroundColor(M3Ui.DIVIDER)
+                    layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, dp(1)
+                    ).apply { leftMargin = dp(12); rightMargin = dp(12) }
+                })
+            }
+        }
+        refreshDeltaRadios()
+        // Keep the radios in sync if the username field is edited.
+        userInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) { refreshDeltaRadios() }
+        })
+
         root.addView(compactButton("Add widget", filled = true) {
             val u = userInput.text.toString().trim().trimStart('@').lowercase()
             if (u.isEmpty()) {
@@ -618,6 +721,7 @@ class MainActivity : Activity() {
                 appThemeKey = key
                 WidgetStore.setAppTheme(this@MainActivity, key)
                 M3Ui.dark = WidgetStore.isAppDarkTheme(this@MainActivity)
+                M3Ui.accentKey = WidgetStore.getAccent(this@MainActivity)
                 recreate()
             }
             appThemeCard.addView(row)
@@ -630,6 +734,104 @@ class MainActivity : Activity() {
                 })
             }
         }
+
+        // ---- accent colour ----
+        root.addView(sectionLabel("Accent colour"))
+        val accentCard = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dp(14).toFloat()
+                setColor(M3Ui.CARD)
+            }
+            setPadding(dp(12), dp(14), dp(12), dp(10))
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        root.addView(accentCard)
+
+        val accentKeys = listOf(
+            "teal" to "Teal",
+            "green" to "Green",
+            "purple" to "Purple",
+            "gold" to "Gold",
+            "pink" to "Pink"
+        )
+        val accentRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        accentCard.addView(accentRow)
+        val accentDots = mutableListOf<ImageView>()
+        fun accentDotDrawable(key: String, selected: Boolean): android.graphics.drawable.Drawable {
+            val dot = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.parseColor(M3Ui.accentSwatch(key)))
+            }
+            if (!selected) return dot
+            val ring = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setStroke(dp(3), Color.WHITE)
+            }
+            return android.graphics.drawable.LayerDrawable(arrayOf(ring, dot)).apply {
+                val inset = dp(6)
+                setLayerInset(1, inset, inset, inset, inset)
+            }
+        }
+        fun refreshAccentDots() {
+            val cur = WidgetStore.getAccent(this)
+            accentKeys.forEachIndexed { i, (key, _) ->
+                accentDots[i].setImageDrawable(accentDotDrawable(key, key == cur))
+            }
+        }
+        accentKeys.forEach { (key, name) ->
+            val cell = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER_HORIZONTAL
+                layoutParams = LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
+                )
+                isClickable = true
+                isFocusable = true
+                setPadding(dp(4), dp(4), dp(4), dp(4))
+            }
+            val dot = ImageView(this).apply {
+                layoutParams = LinearLayout.LayoutParams(dp(52), dp(52))
+            }
+            accentDots.add(dot)
+            cell.addView(dot)
+            cell.addView(TextView(this).apply {
+                text = name
+                setTextColor(M3Ui.GREY)
+                sp(this, 12f)
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = dp(6) }
+            })
+            cell.setOnClickListener {
+                WidgetStore.setAccent(this, key)
+                M3Ui.accentKey = key
+                recreate()
+            }
+            accentRow.addView(cell)
+        }
+        refreshAccentDots()
+        accentCard.addView(TextView(this).apply {
+            text = "Buttons, toggles, links and radios across the app follow the chosen accent."
+            setTextColor(M3Ui.GREY)
+            sp(this, 12f)
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = dp(10); leftMargin = dp(4); rightMargin = dp(4) }
+        })
 
         // ---- how it works ----
         root.addView(sectionLabel("How it works"))

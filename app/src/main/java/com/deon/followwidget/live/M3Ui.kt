@@ -28,9 +28,37 @@ object M3Ui {
      */
     var dark: Boolean = false
 
-    val TEAL get() = Color.parseColor(if (dark) "#5BBAB6" else "#0E7C7B")
-    val TEAL_DARK get() = Color.parseColor(if (dark) "#7FD1CC" else "#06302E")
-    val TEAL_CONTAINER get() = Color.parseColor(if (dark) "#1E3A38" else "#BFE8E5")
+    /**
+     * App accent colour key ("teal", "green", "purple", "gold", "pink").
+     * Activities set this from WidgetStore.getAccent() in onCreate before
+     * building views; TEAL / TEAL_DARK / TEAL_CONTAINER follow it, so every
+     * accent-tinted element (buttons, radios, toggles, links) adapts.
+     */
+    var accentKey: String = "teal"
+
+    private data class Accent(
+        val light: String, val dark: String,
+        val lightDeep: String, val darkDeep: String,
+        val lightContainer: String, val darkContainer: String
+    )
+
+    private val ACCENTS = mapOf(
+        "teal" to Accent("#0E7C7B", "#5BBAB6", "#06302E", "#7FD1CC", "#BFE8E5", "#1E3A38"),
+        "green" to Accent("#2E7D32", "#81C784", "#1B4D1F", "#A5D6A7", "#C8E6C9", "#1E3A24"),
+        "purple" to Accent("#6A3EC9", "#B39DDB", "#3F2380", "#D1C4E9", "#D9CFF5", "#2C2145"),
+        "gold" to Accent("#9C7A1A", "#D9B64A", "#5C4A10", "#E8D189", "#F0E4BC", "#3A2F14"),
+        "pink" to Accent("#D84A6A", "#F48BA2", "#8C2340", "#F8BBCA", "#F9D2DC", "#451E29")
+    )
+
+    private val accent: Accent get() = ACCENTS[accentKey] ?: ACCENTS.getValue("teal")
+
+    /** Swatch hex (light variant) for the accent picker UI. */
+    fun accentSwatch(key: String): String =
+        (ACCENTS[key] ?: ACCENTS.getValue("teal")).light
+
+    val TEAL get() = Color.parseColor(if (dark) accent.dark else accent.light)
+    val TEAL_DARK get() = Color.parseColor(if (dark) accent.darkDeep else accent.lightDeep)
+    val TEAL_CONTAINER get() = Color.parseColor(if (dark) accent.darkContainer else accent.lightContainer)
     val TONAL_BG get() = Color.parseColor(if (dark) "#1A2B2A" else "#CDE8E5")
     val BG get() = Color.parseColor(if (dark) "#101413" else "#FBF8F5")
     val CARD get() = Color.parseColor(if (dark) "#1C2221" else "#EAF0F3")

@@ -279,9 +279,9 @@ class FollowerWidgetProvider : AppWidgetProvider() {
                     View.VISIBLE else View.GONE
             )
 
-            // Manual growth value wins over the auto-computed weekly delta.
+            // Manual growth value wins over the auto-computed delta (daily/weekly per setting).
             val delta: Long? = WidgetStore.getManualDelta(ctx, username)?.toLong()
-                ?: WidgetStore.weekDelta(ctx, username)
+                ?: WidgetStore.deltaFor(ctx, username)
             if (delta == null) {
                 views.setViewVisibility(R.id.delta, View.GONE)
                 views.setViewVisibility(R.id.delta_dark, View.GONE)

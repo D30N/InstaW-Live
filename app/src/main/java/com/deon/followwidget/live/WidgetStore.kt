@@ -103,6 +103,42 @@ object WidgetStore {
             .apply()
     }
 
+    // ---------- app accent colour ----------
+
+    /** Global app accent key: "teal" (default), "green", "purple", "gold", "pink". */
+    fun getAccent(ctx: Context): String =
+        prefs(ctx).getString("accent", "teal") ?: "teal"
+
+    fun setAccent(ctx: Context, key: String) {
+        val safe = if (key in setOf("teal", "green", "purple", "gold", "pink")) key else "teal"
+        prefs(ctx).edit().putString("accent", safe).apply()
+    }
+
+    // ---------- milestone alerts (auto 5K) ----------
+    private const val MILESTONE_STEP = 5000L
+    private const val KEY_MILESTONE_PREFIX = "milestone_"
+
+    /**
+     * Returns the 5K milestone just crossed (e.g. 60000), or null.
+     * The first-ever count sets the baseline silently — no celebration
+     * for milestones passed before tracking began. [u] must already be
+     * keyed (see [key]).
+     */
+    fun checkMilestone(ctx: Context, u: String, count: Long): Long? {
+        if (count < MILESTONE_STEP) return null
+        val seen = prefs(ctx).getLong(KEY_MILESTONE_PREFIX + u, -1)
+        val cur = (count / MILESTONE_STEP) * MILESTONE_STEP
+        if (seen < 0) {
+            prefs(ctx).edit().putLong(KEY_MILESTONE_PREFIX + u, cur).apply()
+            return null
+        }
+        if (cur > seen) {
+            prefs(ctx).edit().putLong(KEY_MILESTONE_PREFIX + u, cur).apply()
+            return cur
+        }
+        return null
+    }
+
     // ---------- per-username cached data ----------
 
     fun getCount(ctx: Context, rawUsername: String): Long =
@@ -112,6 +148,7 @@ object WidgetStore {
         val u = key(rawUsername)
         prefs(ctx).edit().putLong("u_${u}_count", count).apply()
         recordSnapshot(ctx, u, count)
+        checkMilestone(ctx, u, count)?.let { MilestoneAlerts.notify(ctx, rawUsername, it) }
     }
 
     fun getFullName(ctx: Context, rawUsername: String): String =
@@ -192,21 +229,47 @@ object WidgetStore {
      * snapshot if younger than that). Null when there is not enough
      * history to say anything meaningful.
      */
-    fun weekDelta(ctx: Context, rawUsername: String, now: Long = System.currentTimeMillis()): Long? {
+    /**
+     * Growth-pill delta over a rolling window. The window is chosen by the
+     * user's "Growth pill" setting: [dayDelta] (24h) or [weekDelta] (7d).
+     */
+    fun deltaFor(ctx: Context, rawUsername: String): Long? =
+        if (getDeltaMode(ctx, rawUsername) == "daily") dayDelta(ctx, rawUsername)
+        else weekDelta(ctx, rawUsername)
+
+    fun dayDelta(ctx: Context, rawUsername: String, now: Long = System.currentTimeMillis()): Long? =
+        windowDelta(ctx, rawUsername, now, 24L * 60 * 60 * 1000)
+
+    fun weekDelta(ctx: Context, rawUsername: String, now: Long = System.currentTimeMillis()): Long? =
+        windowDelta(ctx, rawUsername, now, 7L * 24 * 60 * 60 * 1000)
+
+    /** "Growth pill" window per username: "weekly" (default) or "daily". */
+    fun getDeltaMode(ctx: Context, rawUsername: String): String =
+        prefs(ctx).getString("u_${key(rawUsername)}_deltamode", "weekly") ?: "weekly"
+
+    fun setDeltaMode(ctx: Context, rawUsername: String, mode: String) {
+        prefs(ctx).edit()
+            .putString("u_${key(rawUsername)}_deltamode", if (mode == "daily") "daily" else "weekly")
+            .apply()
+    }
+
+    private fun windowDelta(
+        ctx: Context, rawUsername: String, now: Long, windowMs: Long
+    ): Long? {
         val snaps = getSnapshots(ctx, key(rawUsername))
         if (snaps.length() == 0) return null
-        val weekAgo = now - 7L * 24 * 60 * 60 * 1000
-        // Baselines older than the keep window are stale (e.g. the Sep 23
-        // seed) and must never anchor the rolling 7-day delta.
+        val windowStart = now - windowMs
+        // Baselines older than the keep window are stale and must never
+        // anchor the rolling delta.
         val oldestUsable = now - SNAPSHOT_KEEP_MS
         var base: JSONArray? = null
         for (i in 0 until snaps.length()) {
             val arr = snaps.optJSONArray(i) ?: continue
             val t = arr.optLong(0)
-            if (t <= weekAgo && t >= oldestUsable) base = arr // latest snapshot ~7 days old
+            if (t <= windowStart && t >= oldestUsable) base = arr // latest snapshot ~window old
         }
         if (base == null) {
-            // No snapshot near 7 days ago — oldest usable snapshot we have.
+            // No snapshot near the window start — oldest usable snapshot we have.
             for (i in 0 until snaps.length()) {
                 val arr = snaps.optJSONArray(i) ?: continue
                 if (arr.optLong(0) >= oldestUsable) { base = arr; break }
@@ -214,7 +277,7 @@ object WidgetStore {
         }
         base ?: return null
         // Need a little history for the delta to mean anything (an hour —
-        // the seed covers day one, real snapshots take over after that).
+        // real snapshots take over after that).
         if (now - base.optLong(0) < 60L * 60 * 1000) return null
         val current = getCount(ctx, rawUsername)
         if (current < 0) return null

@@ -44,6 +44,7 @@ class WidgetConfigActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         M3Ui.dark = WidgetStore.isAppDarkTheme(this)
+        M3Ui.accentKey = WidgetStore.getAccent(this)
         window.statusBarColor = M3Ui.BG
 
         appWidgetId = intent?.extras?.getInt(
