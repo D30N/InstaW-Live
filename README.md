@@ -14,6 +14,12 @@
 - 👤 **Avatar, name & verified badge** — your profile, faithfully rendered
 - 🔐 **Private by design** — optional in-app Instagram login via WebView; your password is typed into Instagram's own page and never leaves your phone. Only the session cookie is kept in app-private storage. No data is sent anywhere else.
 
+## Screenshots
+
+| Dark card | Light card | Name-on-top style |
+|-----------|------------|-------------------|
+| ![Dark card](screenshots/widget-dark.png) | ![Light card](screenshots/widget-light.png) | ![Name on top](screenshots/widget-nametop-dark.png) |
+
 ## Download
 
 Grab the latest APK from the [**Releases**](../../releases) page and install it on your phone (Android 8.0+).
