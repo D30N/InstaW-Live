@@ -455,88 +455,6 @@ class MainActivity : Activity() {
         }
         renderStylePreviews()
 
-        // ---- card theme ----
-        root.addView(sectionLabel("Card theme"))
-        // themeKey already initialized above (card style previews need it).
-        val themeCard = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            background = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = dp(14).toFloat()
-                setColor(M3Ui.CARD)
-            }
-            setPadding(dp(4), dp(4), dp(4), dp(4))
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
-        root.addView(themeCard)
-        val radioViews = mutableListOf<ImageView>()
-        fun refreshRadios() {
-            themeKeys.forEachIndexed { i, (key, _) ->
-                radioViews[i].setImageDrawable(M3Ui.radioDrawable(this, key == themeKey))
-            }
-        }
-        themeKeys.forEachIndexed { index, (key, title) ->
-            val row = LinearLayout(this).apply {
-                orientation = LinearLayout.HORIZONTAL
-                gravity = Gravity.CENTER_VERTICAL
-                setPadding(dp(12), dp(9), dp(12), dp(9))
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                isClickable = true
-                isFocusable = true
-            }
-            row.addView(TextView(this).apply {
-                text = title
-                setTextColor(M3Ui.INK)
-                sp(this, 15f)
-                layoutParams = LinearLayout.LayoutParams(
-                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
-                )
-            })
-            val radio = ImageView(this).apply {
-                setImageDrawable(M3Ui.radioDrawable(this@MainActivity, key == themeKey))
-                layoutParams = LinearLayout.LayoutParams(dp(20), dp(20))
-            }
-            radioViews.add(radio)
-            row.addView(radio)
-            row.setOnClickListener {
-                // Persist immediately and push to existing widgets that were
-                // following the previous default theme, so the app's theme
-                // picker acts as a global setting (a widget the user
-                // deliberately customized keeps its own theme).
-                val oldDefault = WidgetStore.getDefaultTheme(this@MainActivity)
-                themeKey = key
-                WidgetStore.setDefaultTheme(this@MainActivity, key)
-                refreshRadios()
-                renderStylePreviews()
-                val ids = FollowerWidgetProvider.allWidgetIds(this@MainActivity)
-                ids.forEach { id ->
-                    if (WidgetStore.getTheme(this@MainActivity, id) == oldDefault) {
-                        WidgetStore.setTheme(this@MainActivity, id, key)
-                    }
-                    FollowerWidgetProvider.updateWidget(this@MainActivity, id)
-                }
-                if (ids.isNotEmpty()) {
-                    FollowerWidgetProvider.enqueueRefresh(this@MainActivity, ids)
-                }
-                Toast.makeText(this@MainActivity, "Theme updated", Toast.LENGTH_SHORT).show()
-            }
-            themeCard.addView(row)
-            if (index < themeKeys.size - 1) {
-                themeCard.addView(View(this).apply {
-                    setBackgroundColor(M3Ui.DIVIDER)
-                    layoutParams = LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT, dp(1)
-                    ).apply { leftMargin = dp(12); rightMargin = dp(12) }
-                })
-            }
-        }
-
         // ---- growth pill (daily / weekly delta) ----
         root.addView(sectionLabel("Growth pill"))
         val deltaCard = LinearLayout(this).apply {
@@ -628,6 +546,88 @@ class MainActivity : Activity() {
             override fun onTextChanged(s: CharSequence?, a: Int, b: Int, c: Int) {}
             override fun afterTextChanged(s: android.text.Editable?) { refreshDeltaRadios() }
         })
+
+        // ---- card theme ----
+        root.addView(sectionLabel("Card theme"))
+        // themeKey already initialized above (card style previews need it).
+        val themeCard = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                cornerRadius = dp(14).toFloat()
+                setColor(M3Ui.CARD)
+            }
+            setPadding(dp(4), dp(4), dp(4), dp(4))
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        root.addView(themeCard)
+        val radioViews = mutableListOf<ImageView>()
+        fun refreshRadios() {
+            themeKeys.forEachIndexed { i, (key, _) ->
+                radioViews[i].setImageDrawable(M3Ui.radioDrawable(this, key == themeKey))
+            }
+        }
+        themeKeys.forEachIndexed { index, (key, title) ->
+            val row = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(dp(12), dp(9), dp(12), dp(9))
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+                isClickable = true
+                isFocusable = true
+            }
+            row.addView(TextView(this).apply {
+                text = title
+                setTextColor(M3Ui.INK)
+                sp(this, 15f)
+                layoutParams = LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f
+                )
+            })
+            val radio = ImageView(this).apply {
+                setImageDrawable(M3Ui.radioDrawable(this@MainActivity, key == themeKey))
+                layoutParams = LinearLayout.LayoutParams(dp(20), dp(20))
+            }
+            radioViews.add(radio)
+            row.addView(radio)
+            row.setOnClickListener {
+                // Persist immediately and push to existing widgets that were
+                // following the previous default theme, so the app's theme
+                // picker acts as a global setting (a widget the user
+                // deliberately customized keeps its own theme).
+                val oldDefault = WidgetStore.getDefaultTheme(this@MainActivity)
+                themeKey = key
+                WidgetStore.setDefaultTheme(this@MainActivity, key)
+                refreshRadios()
+                renderStylePreviews()
+                val ids = FollowerWidgetProvider.allWidgetIds(this@MainActivity)
+                ids.forEach { id ->
+                    if (WidgetStore.getTheme(this@MainActivity, id) == oldDefault) {
+                        WidgetStore.setTheme(this@MainActivity, id, key)
+                    }
+                    FollowerWidgetProvider.updateWidget(this@MainActivity, id)
+                }
+                if (ids.isNotEmpty()) {
+                    FollowerWidgetProvider.enqueueRefresh(this@MainActivity, ids)
+                }
+                Toast.makeText(this@MainActivity, "Theme updated", Toast.LENGTH_SHORT).show()
+            }
+            themeCard.addView(row)
+            if (index < themeKeys.size - 1) {
+                themeCard.addView(View(this).apply {
+                    setBackgroundColor(M3Ui.DIVIDER)
+                    layoutParams = LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT, dp(1)
+                    ).apply { leftMargin = dp(12); rightMargin = dp(12) }
+                })
+            }
+        }
 
         root.addView(compactButton("Add widget", filled = true) {
             val u = userInput.text.toString().trim().trimStart('@').lowercase()
