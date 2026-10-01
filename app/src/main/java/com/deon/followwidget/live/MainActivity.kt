@@ -525,6 +525,7 @@ class MainActivity : Activity() {
                 val u = userInput.text.toString().trim().trimStart('@').lowercase()
                 if (u.isNotEmpty()) WidgetStore.setDeltaMode(this, u, key)
                 refreshDeltaRadios()
+                renderStylePreviews()
                 FollowerWidgetProvider.allWidgetIds(this)
                     .forEach { FollowerWidgetProvider.updateWidget(this, it) }
                 Toast.makeText(this, "Growth pill: $title", Toast.LENGTH_SHORT).show()
