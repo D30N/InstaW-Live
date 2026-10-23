@@ -859,38 +859,20 @@ class MainActivity : Activity() {
             ).apply { topMargin = dp(18); leftMargin = dp(4); rightMargin = dp(4) }
         })
         root.addView(TextView(this).apply {
-            text = "This app is made by Deon"
-            setTextColor(M3Ui.GREY)
+            text = "This app was made by Deon"
+            setTextColor(M3Ui.TEAL)
+            paintFlags = paintFlags or android.graphics.Paint.UNDERLINE_TEXT_FLAG
             sp(this, 13f)
             gravity = Gravity.CENTER
+            setOnClickListener {
+                startActivity(
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://deepakdeon.github.io"))
+                )
+            }
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = dp(14) }
-        })
-        root.addView(TextView(this).apply {
-            val handle = SpannableString("@deepak.deon")
-            handle.setSpan(object : ClickableSpan() {
-                override fun onClick(widget: View) {
-                    startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://instagram.com/deepak.deon"))
-                    )
-                }
-                override fun updateDrawState(ds: TextPaint) {
-                    super.updateDrawState(ds)
-                    ds.color = M3Ui.TEAL
-                    ds.isUnderlineText = true
-                }
-            }, 0, handle.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            text = handle
-            movementMethod = LinkMovementMethod.getInstance()
-            highlightColor = Color.TRANSPARENT
-            sp(this, 14f)
-            gravity = Gravity.CENTER
-            layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ).apply { topMargin = dp(4); bottomMargin = dp(4) }
+            ).apply { topMargin = dp(14); bottomMargin = dp(4) }
         })
         root.addView(TextView(this).apply {
             val pi = runCatching { packageManager.getPackageInfo(packageName, 0) }.getOrNull()
